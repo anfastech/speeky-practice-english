@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Speeky — Practice English with Confidence</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #4169E1;
+      --accent: #FFF44F;
+      --surface: #E6E6FA;
+      --ink: #0D0D0D;
+      --ink-muted: #5A5A72;
+    }
+    body { font-family: 'DM Sans', sans-serif; background: #f8f8fc; }
+    h1, h2, h3, .heading { font-family: 'Plus Jakarta Sans', sans-serif; }
+
+    .card-hover {
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .card-hover:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(65, 105, 225, 0.15);
+    }
+    .card-hover:active {
+      transform: translateY(0);
+    }
+
+    .tab-active {
+      background: var(--primary);
+      color: white;
+    }
+    .tab-inactive {
+      background: white;
+      color: var(--ink-muted);
+    }
+
+    .badge-beginner { background: #dcfce7; color: #16a34a; }
+    .badge-intermediate { background: #fef9c3; color: #a16207; }
+    .badge-advanced { background: #fee2e2; color: #dc2626; }
+
+    @keyframes fade-in {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in { animation: fade-in 0.4s ease-out forwards; }
+    .fade-in-delay { animation: fade-in 0.4s ease-out 0.1s both; }
+  </style>
+</head>
+<body class="min-h-screen">
+
+  <!-- HEADER -->
+  <header class="bg-white border-b border-gray-100 sticky top-0 z-10">
+    <div class="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <span class="text-2xl">🗣️</span>
+        <span class="text-xl font-bold heading" style="color: var(--primary)">Speeky</span>
+      </div>
+      <p class="text-xs text-gray-400 hidden sm:block">Safe space to learn English</p>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="max-w-2xl mx-auto px-4 pt-8 pb-6 fade-in">
+    <div class="bg-white rounded-3xl p-6 border border-indigo-100 shadow-sm">
+      <p class="text-xs font-semibold uppercase tracking-widest mb-2" style="color: var(--primary)">Practice Daily</p>
+      <h1 class="text-2xl font-bold heading text-gray-900 leading-snug">
+        Speak English without<br>the fear of judgment.
+      </h1>
+      <p class="text-sm text-gray-500 mt-2">Choose a scenario, speak naturally, and get instant feedback — in Manglish 🙂</p>
+    </div>
+  </section>
+
+  <!-- MODE TABS -->
+  <section class="max-w-2xl mx-auto px-4 mb-4 fade-in-delay">
+    <div class="flex gap-2 bg-white rounded-2xl p-1.5 border border-gray-100 shadow-sm">
+      <button
+        id="tab-daily"
+        onclick="switchTab('daily')"
+        class="flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all tab-active"
+      >
+        🌟 Daily English
+      </button>
+      <button
+        id="tab-interview"
+        onclick="switchTab('interview')"
+        class="flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all tab-inactive"
+      >
+        💼 Interview Mode
+      </button>
+    </div>
+  </section>
+
+  <!-- DAILY SCENARIOS -->
+  <section id="panel-daily" class="max-w-2xl mx-auto px-4 pb-10">
+    <p class="text-xs text-gray-400 mb-3 uppercase tracking-wide font-medium">Real-life conversations</p>
+    <div class="grid gap-3">
+      {% for scenario in daily_scenarios %}
+      <a href="{% url 'session' scenario.id %}?reset=1" class="block">
+        <div class="card-hover bg-white rounded-2xl p-4 border border-gray-100 flex items-center gap-4 cursor-pointer">
+          <div class="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl flex-none"
+               style="background: var(--surface)">
+            {{ scenario.icon }}
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 flex-wrap">
+              <h3 class="text-sm font-semibold text-gray-900 heading">{{ scenario.title }}</h3>
+              <span class="badge-{{ scenario.difficulty }} text-xs px-2 py-0.5 rounded-full font-medium capitalize">
+                {{ scenario.difficulty }}
+              </span>
+            </div>
+            <p class="text-xs text-gray-400 mt-0.5 truncate">{{ scenario.situation_text|truncatechars:65 }}</p>
+          </div>
+          <svg class="text-gray-300 flex-none" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path d="M9 18l6-6-6-6"/>
+          </svg>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  </section>
+
+  <!-- INTERVIEW SCENARIOS (hidden by default) -->
+  <section id="panel-interview" class="max-w-2xl mx-auto px-4 pb-10 hidden">
+    <p class="text-xs text-gray-400 mb-3 uppercase tracking-wide font-medium">Job & campus interviews</p>
+    <div class="grid gap-3">
+      {% for scenario in interview_scenarios %}
+      <a href="{% url 'session' scenario.id %}?reset=1" class="block">
+        <div class="card-hover bg-white rounded-2xl p-4 border border-gray-100 flex items-center gap-4 cursor-pointer">
+          <div class="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl flex-none"
+               style="background: var(--surface)">
+            {{ scenario.icon }}
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 flex-wrap">
+              <h3 class="text-sm font-semibold text-gray-900 heading">{{ scenario.title }}</h3>
+              <span class="badge-{{ scenario.difficulty }} text-xs px-2 py-0.5 rounded-full font-medium capitalize">
+                {{ scenario.difficulty }}
+              </span>
+            </div>
+            <p class="text-xs text-gray-400 mt-0.5 truncate">{{ scenario.situation_text|truncatechars:65 }}</p>
+          </div>
+          <svg class="text-gray-300 flex-none" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path d="M9 18l6-6-6-6"/>
+          </svg>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  </section>
+
+  <script>
+    function switchTab(mode) {
+      const tabs = { daily: document.getElementById('tab-daily'), interview: document.getElementById('tab-interview') };
+      const panels = { daily: document.getElementById('panel-daily'), interview: document.getElementById('panel-interview') };
+
+      Object.keys(tabs).forEach(key => {
+        if (key === mode) {
+          tabs[key].classList.replace('tab-inactive', 'tab-active');
+          panels[key].classList.remove('hidden');
+        } else {
+          tabs[key].classList.replace('tab-active', 'tab-inactive');
+          panels[key].classList.add('hidden');
+        }
+      });
+    }
+  </script>
+</body>
+</html>
