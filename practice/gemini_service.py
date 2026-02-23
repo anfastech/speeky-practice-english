@@ -79,7 +79,7 @@ RULES:
 - Always be warm and encouraging. Never harsh or discouraging.
 - Manglish tip: mix Malayalam words naturally (e.g. "Ingane parayumbol more polite aakum: ...")
 - Score: 60-100 range for reasonable attempts. Only below 60 for very poor effort.
-- Phonetic example: "could I have" → "kud AY hav"
+- Phonetic example: "could I have" → "kud i hav"
 - {final_note}
 
 RESPOND IN THIS EXACT JSON FORMAT ONLY (no markdown, no code blocks, no extra text):
@@ -94,7 +94,7 @@ RESPOND IN THIS EXACT JSON FORMAT ONLY (no markdown, no code blocks, no extra te
     "grammar": "one specific grammar tip",
     "tone": "one sentence on politeness / tone",
     "better_phrases": [
-      {{"phrase": "better way to say it", "phonetic": "BEH-ter WAY tuh SAY it"}}
+      {{"phrase": "better way to say it", "manglish": "Manglish version of the phrase"}}
     ]
   }}
 }}"""
