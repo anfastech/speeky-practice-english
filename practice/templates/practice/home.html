@@ -59,7 +59,15 @@
         <span class="text-2xl">🗣️</span>
         <span class="text-xl font-bold heading" style="color: var(--primary)">Speeky</span>
       </div>
-      <p class="text-xs text-gray-400 hidden sm:block">Safe space to learn English</p>
+      <div class="flex items-center gap-3">
+        <span class="text-xs text-gray-400 hidden sm:block truncate max-w-[160px]">{{ request.session.supabase_user.email }}</span>
+        <form method="POST" action="/logout/">
+          {% csrf_token %}
+          <button type="submit" class="text-xs font-medium px-3 py-1.5 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 transition-colors">
+            Sign out
+          </button>
+        </form>
+      </div>
     </div>
   </header>
 

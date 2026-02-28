@@ -5,8 +5,10 @@ from django.views.decorators.http import require_http_methods
 
 from .scenarios import SCENARIOS, DAILY_SCENARIOS, INTERVIEW_SCENARIOS
 from .gemini_service import chat_with_text, chat_with_audio
+from accounts.decorators import supabase_login_required
 
 
+@supabase_login_required
 def home(request):
     return render(request, 'practice/home.html', {
         'daily_scenarios': DAILY_SCENARIOS,
@@ -14,6 +16,7 @@ def home(request):
     })
 
 
+@supabase_login_required
 def session(request, scenario_id):
     scenario = SCENARIOS.get(scenario_id)
     if not scenario:
@@ -33,6 +36,7 @@ def session(request, scenario_id):
     })
 
 
+@supabase_login_required
 @require_http_methods(["POST"])
 def chat_api(request, scenario_id):
     scenario = SCENARIOS.get(scenario_id)
@@ -76,6 +80,7 @@ def chat_api(request, scenario_id):
         return JsonResponse({'success': False, 'error': str(e)}, status=500)
 
 
+@supabase_login_required
 @require_http_methods(["POST"])
 def reset_session(request, scenario_id):
     request.session['scenario_id'] = scenario_id

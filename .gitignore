@@ -42,7 +42,13 @@ Thumbs.db
 *.bak
 
 # Markdown files
+!report.md
 *.md
 
 # Reference project
 reference-project/
+report_Project Documentation.docx.pdf
+.claude/settings.local.json
+test_gemini.py
+test_supabase.py
+Project Documentation.docx

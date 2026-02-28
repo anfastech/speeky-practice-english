@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 from dotenv import load_dotenv
+from supabase import create_client
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / '.env')
@@ -13,6 +14,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'accounts',
     'practice',
 ]
 
@@ -51,6 +53,11 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
+
+SUPABASE_CLIENT = create_client(
+    os.environ.get('SUPABASE_URL', ''),
+    os.environ.get('SUPABASE_KEY', ''),
+)
 
 # Allow larger audio uploads (20MB)
 DATA_UPLOAD_MAX_MEMORY_SIZE = 20 * 1024 * 1024
