@@ -46,6 +46,13 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'speeky_project.wsgi.application'
 
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
+
 # Cookie-based sessions — no database needed
 SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
 

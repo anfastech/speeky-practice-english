@@ -1,7 +1,5 @@
 from django.shortcuts import render, redirect
-from django.conf import settings
-
-supabase = settings.SUPABASE_CLIENT
+from accounts.models import DemoUser
 
 
 def login_view(request):
@@ -41,72 +39,46 @@ def login_view(request):
                 'email': email,
             })
 
-        try:
-            if mode == 'signup':
-                response = supabase.auth.sign_up({'email': email, 'password': password})
-
-                if response.user is None:
-                    return render(request, 'accounts/login.html', {
-                        'mode': mode,
-                        'next': next_url,
-                        'error': 'Signup failed. Please try again.',
-                        'email': email,
-                    })
-
-                # Email confirmation required — don't log in yet
-                if response.session is None:
-                    return render(request, 'accounts/login.html', {
-                        'mode': 'signin',
-                        'next': next_url,
-                        'success': 'Account created! Please check your email to confirm your account, then sign in.',
-                        'email': email,
-                    })
-
-                # Supabase auto-confirmed (e.g. email confirmations disabled)
-                request.session['supabase_user'] = {
-                    'email': response.user.email,
-                    'id': str(response.user.id),
-                    'access_token': response.session.access_token,
-                }
-                return redirect(next_url if next_url.startswith('/') else '/')
-            else:
-                response = supabase.auth.sign_in_with_password({'email': email, 'password': password})
-
-                if response.user is None:
-                    return render(request, 'accounts/login.html', {
-                        'mode': mode,
-                        'next': next_url,
-                        'error': 'Authentication failed. Please check your credentials.',
-                        'email': email,
-                    })
-
-                request.session['supabase_user'] = {
-                    'email': response.user.email,
-                    'id': str(response.user.id),
-                    'access_token': response.session.access_token if response.session else '',
-                }
-                return redirect(next_url if next_url.startswith('/') else '/')
-
-        except Exception as e:
-            error_msg = str(e)
-            # Sanitize common Supabase error messages
-            if 'Invalid login credentials' in error_msg:
-                error_msg = 'Invalid email or password.'
-            elif 'Email not confirmed' in error_msg:
-                error_msg = 'Please confirm your email before signing in. Check your inbox for a confirmation link.'
-            elif 'User already registered' in error_msg:
-                error_msg = 'An account with this email already exists. Please sign in.'
-            elif 'Password should be at least' in error_msg:
-                error_msg = 'Password must be at least 8 characters.'
-            else:
-                error_msg = 'Something went wrong. Please try again.'
-
-            return render(request, 'accounts/login.html', {
-                'mode': mode,
-                'next': next_url,
-                'error': error_msg,
+        if mode == 'signup':
+            if DemoUser.objects.filter(email=email).exists():
+                return render(request, 'accounts/login.html', {
+                    'mode': mode,
+                    'next': next_url,
+                    'error': 'An account with this email already exists. Please sign in.',
+                    'email': email,
+                })
+            user = DemoUser(email=email)
+            user.set_password(password)
+            user.save()
+            request.session['supabase_user'] = {
                 'email': email,
-            })
+                'id': str(user.id),
+                'access_token': '',
+            }
+            return redirect(next_url if next_url.startswith('/') else '/')
+        else:
+            try:
+                user = DemoUser.objects.get(email=email)
+            except DemoUser.DoesNotExist:
+                return render(request, 'accounts/login.html', {
+                    'mode': mode,
+                    'next': next_url,
+                    'error': 'Invalid email or password.',
+                    'email': email,
+                })
+            if not user.check_password(password):
+                return render(request, 'accounts/login.html', {
+                    'mode': mode,
+                    'next': next_url,
+                    'error': 'Invalid email or password.',
+                    'email': email,
+                })
+            request.session['supabase_user'] = {
+                'email': email,
+                'id': str(user.id),
+                'access_token': '',
+            }
+            return redirect(next_url if next_url.startswith('/') else '/')
 
     return render(request, 'accounts/login.html', {
         'mode': mode,
@@ -116,9 +88,5 @@ def login_view(request):
 
 def logout_view(request):
     if request.method == 'POST':
-        try:
-            supabase.auth.sign_out()
-        except Exception:
-            pass
         request.session.flush()
     return redirect('/login/')
